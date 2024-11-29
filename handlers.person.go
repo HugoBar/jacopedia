@@ -4,6 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"jacopedia/database"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,17 +22,9 @@ func getPerson(c *gin.Context) {
 		// Check if the person exists
 		if person, err := getPersonByID(personID); err == nil {
 			// Call the HTML method of the Context to render a template
-			c.HTML(
-				// Set the HTTP status to 200 (OK)
-				http.StatusOK,
-				// Use the person.html template
-				"person.html",
-				// Pass the data that the page uses
-				gin.H{
-					"name":    person.Name,
-					"payload": person,
-				},
-			)
+			render(c, gin.H{
+				"name":    person.Name,
+				"payload": person}, "person.html")
 
 		} else {
 			// If the person is not found, abort with an error
@@ -41,6 +35,35 @@ func getPerson(c *gin.Context) {
 		// If an invalid person ID is specified in the URL, abort with an error
 		c.AbortWithStatus(http.StatusNotFound)
 	}
+}
+
+func createPerson(c *gin.Context) {
+	var newPerson person
+
+	// Call BindJSON to bind the received JSON to
+	// newPerson.
+	if err := c.BindJSON(&newPerson); err != nil {
+		return
+	}
+
+	// Insert the new person into the database
+	query := `
+        INSERT INTO people (name, age, birthday, profile_picture_id, title)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id;
+    `
+
+	var newID int
+	err := database.DB.QueryRow(query, newPerson.Name, newPerson.Age, newPerson.Birthday, newPerson.ProfilePictureID, newPerson.Title).Scan(&newID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert person into database"})
+		return
+	}
+
+	// Update newPerson with the returned ID
+	newPerson.ID = newID
+
+	c.IndentedJSON(http.StatusCreated, newPerson)
 }
 
 func render(c *gin.Context, data gin.H, templateName string) {

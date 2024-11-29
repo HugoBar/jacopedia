@@ -35,6 +35,7 @@ func main() {
 	router.GET("/", showIndexPage)
 
 	router.GET("/person/view/:person_id", getPerson)
+	router.POST("/person", createPerson)
 
 	router.Run()
 }
