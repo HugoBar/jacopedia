@@ -1,7 +1,7 @@
 CREATE TABLE people (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    age INTEGER UNIQUE NOT NULL,
+    age INTEGER NOT NULL,
     birthday VARCHAR(255) NOT NULL,
     profile_picture_id VARCHAR(255) NOT NULL,
     title VARCHAR(255) NOT NULL,
