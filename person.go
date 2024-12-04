@@ -15,11 +15,6 @@ type person struct {
 	Title            string `json:"title"`
 }
 
-var peopleList = []person{
-	{ID: 1, Name: "Alice", Age: 25, Birthday: "1999-05-15", ProfilePictureID: "placeholder", Title: "Founder"},
-	{ID: 2, Name: "Bob", Age: 30, Birthday: "1994-08-22", ProfilePictureID: "placeholder", Title: "Employee"},
-}
-
 func getAllPeople() ([]person, error) {
 	// Query to retrieve all people
 	query := `SELECT id, name, age, birthday, profile_picture_id, title FROM people`

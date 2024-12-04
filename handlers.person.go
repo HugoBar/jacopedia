@@ -10,14 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func showIndexPage(c *gin.Context) {
-	people, _ := getAllPeople()
-
-	render(c, gin.H{
-		"title":   "Home Page",
-		"payload": people}, "index.html")
-}
-
 func getPeople(c *gin.Context) {
 	people, err := getAllPeople()
 	if err != nil {
@@ -76,17 +68,4 @@ func createPerson(c *gin.Context) {
 	newPerson.ID = newID
 
 	c.IndentedJSON(http.StatusCreated, newPerson)
-}
-
-func render(c *gin.Context, data gin.H, templateName string) {
-
-	switch c.Request.Header.Get("Accept") {
-	case "application/json":
-		// Respond with JSON
-		c.JSON(http.StatusOK, data["payload"])
-	default:
-		// Respond with HTML
-		c.HTML(http.StatusOK, templateName, data)
-	}
-
 }
