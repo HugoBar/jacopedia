@@ -1,8 +1,9 @@
 package main
 
 import (
-	"errors"
+	"database/sql"
 	"jacopedia/database"
+	"log"
 )
 
 type person struct {
@@ -50,12 +51,20 @@ func getAllPeople() ([]person, error) {
 	return people, nil
 }
 
-func getPersonByID(id int) (*person, error) {
-	for _, p := range peopleList {
-		if p.ID == id {
-			return &p, nil
+func getPersonByID(id int) (person, error) {
+	var p person
+
+	// Query to retrieve a person by id
+	query := `SELECT id, name, age, birthday, profile_picture_id, title FROM people WHERE id = $1`
+	err := database.DB.QueryRow(query, id).Scan(&p.ID, &p.Name, &p.Age, &p.Birthday, &p.ProfilePictureID, &p.Title)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return p, nil // Return an empty struct if no rows are found
 		}
+		log.Println("Error scanning row:", err)
+		return p, err
 	}
 
-	return nil, errors.New("person not found")
+	return p, nil
 }

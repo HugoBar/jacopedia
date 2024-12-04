@@ -37,11 +37,7 @@ func getPerson(c *gin.Context) {
 	if personID, err := strconv.Atoi(c.Param("person_id")); err == nil {
 		// Check if the person exists
 		if person, err := getPersonByID(personID); err == nil {
-			// Call the HTML method of the Context to render a template
-			render(c, gin.H{
-				"name":    person.Name,
-				"payload": person}, "person.html")
-
+			c.JSON(http.StatusOK, person)
 		} else {
 			// If the person is not found, abort with an error
 			c.AbortWithError(http.StatusNotFound, err)

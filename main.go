@@ -33,9 +33,10 @@ func main() {
 
 	// Handle Index
 	router.GET("/", showIndexPage)
+	router.GET("/person/view/:person_id", getPerson)
 
 	router.GET("/person/all", getPeople)
-	router.GET("/person/view/:person_id", getPerson)
+	router.GET("/person/:person_id", getPerson)
 	router.POST("/person", createPerson)
 
 	router.Run()
