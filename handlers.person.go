@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -10,11 +11,26 @@ import (
 )
 
 func showIndexPage(c *gin.Context) {
-	people := getAllPeople()
+	people, _ := getAllPeople()
 
 	render(c, gin.H{
 		"title":   "Home Page",
 		"payload": people}, "index.html")
+}
+
+func getPeople(c *gin.Context) {
+	people, err := getAllPeople()
+	if err != nil {
+		// If there's an error, return a 500 internal server error with a message
+		log.Println("Error fetching people:", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "Failed to retrieve people",
+		})
+		return
+	}
+
+	// Return the list of people as a JSON response
+	c.JSON(http.StatusOK, people)
 }
 
 func getPerson(c *gin.Context) {
