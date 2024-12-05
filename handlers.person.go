@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"jacopedia/database"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -50,22 +48,12 @@ func createPerson(c *gin.Context) {
 		return
 	}
 
-	// Insert the new person into the database
-	query := `
-        INSERT INTO people (name, age, birthday, profile_picture_id, title)
-        VALUES ($1, $2, $3, $4, $5)
-        RETURNING id;
-    `
-
-	var newID int
-	err := database.DB.QueryRow(query, newPerson.Name, newPerson.Age, newPerson.Birthday, newPerson.ProfilePictureID, newPerson.Title).Scan(&newID)
+	createdPerson, err := addPerson(newPerson)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert person into database"})
 		return
 	}
 
-	// Update newPerson with the returned ID
-	newPerson.ID = newID
-
-	c.IndentedJSON(http.StatusCreated, newPerson)
+	// Respond with the created person
+	c.IndentedJSON(http.StatusCreated, createdPerson)
 }

@@ -63,3 +63,24 @@ func getPersonByID(id int) (person, error) {
 
 	return p, nil
 }
+
+func addPerson(newPerson person) (person, error) {
+	// Insert the new person into the database
+	query := `
+        INSERT INTO people (name, age, birthday, profile_picture_id, title)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id;
+    `
+
+	var newID int
+	err := database.DB.QueryRow(query, newPerson.Name, newPerson.Age, newPerson.Birthday, newPerson.ProfilePictureID, newPerson.Title).Scan(&newID)
+	if err != nil {
+		log.Println("Error adding record:", err)
+		return person{}, err
+	}
+
+	// Update newPerson with the returned ID
+	newPerson.ID = newID
+
+	return newPerson, nil
+}
